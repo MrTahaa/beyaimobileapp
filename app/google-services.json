@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "882640462443",
+    "firebase_url": "https://beyazai-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "beyazai",
+    "storage_bucket": "beyazai.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:882640462443:android:3a0ef8ae0aa0331ac4472e",
+        "android_client_info": {
+          "package_name": "com.example.beyazai"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBLjh5BJQEjBIxK8pSTFfFXCa7-2xToog0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
