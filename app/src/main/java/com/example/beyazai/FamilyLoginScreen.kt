@@ -11,6 +11,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -94,8 +95,13 @@ fun FamilyLoginScreen(navController: NavController) {
                     singleLine = true,
                     shape = RoundedCornerShape(8.dp),
                     colors = OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = BeyazNavy,
+                        unfocusedTextColor = BeyazNavy,
+                        focusedContainerColor = Color.White,
+                        unfocusedContainerColor = Color.White,
                         focusedBorderColor = BeyazTeal,
                         focusedLabelColor = BeyazTeal,
+                        unfocusedLabelColor = BeyazTextSecondary,
                         cursorColor = BeyazTeal,
                         unfocusedBorderColor = BeyazSurfaceVariant
                     ),

@@ -9,6 +9,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.*
@@ -19,6 +21,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -75,6 +78,8 @@ fun MapDisplay(pairingCode: String, onLogout: () -> Unit) {
 
     // 1. ARTIK FAKE LOG YOK, CANLI FİREBASE LİSTESİ VAR!
     val canliLoglar = remember { mutableStateListOf<Pair<String, String>>() }
+    val logsPerPage = 5
+    var currentLogPage by remember { mutableStateOf(0) }
 
     // HARİTA KONUM DİNLEYİCİSİ (Aynı kaldı)
     LaunchedEffect(pairingCode) {
@@ -111,9 +116,21 @@ fun MapDisplay(pairingCode: String, onLogout: () -> Unit) {
         cameraPositionState.animate(CameraUpdateFactory.newLatLngZoom(cihazKonumu, 15f), 1000)
     }
 
+    val totalLogPages = maxOf(1, (canliLoglar.size + logsPerPage - 1) / logsPerPage)
+    val visibleLoglar = canliLoglar
+        .drop(currentLogPage * logsPerPage)
+        .take(logsPerPage)
+
+    LaunchedEffect(canliLoglar.size) {
+        val lastPage = maxOf(0, totalLogPages - 1)
+        if (currentLogPage > lastPage) {
+            currentLogPage = lastPage
+        }
+    }
+
     Column(modifier = Modifier.fillMaxSize().background(BeyazBackground)) {
-        // ÜST KISIM: HARİTA (%60)
-        Box(modifier = Modifier.weight(0.6f)) {
+        // ÜST KISIM: HARİTA
+        Box(modifier = Modifier.weight(0.45f)) {
             GoogleMap(modifier = Modifier.fillMaxSize(), cameraPositionState = cameraPositionState) {
                 Marker(state = MarkerState(position = cihazKonumu), title = "Cihaz Konumu")
             }
@@ -139,10 +156,10 @@ fun MapDisplay(pairingCode: String, onLogout: () -> Unit) {
             }
         }
 
-        // ALT KISIM: TELEMETRİ VE LOG PANELI (%40)
+        // ALT KISIM: TELEMETRİ VE LOG PANELI
         Surface(
             modifier = Modifier
-                .weight(0.4f)
+                .weight(0.55f)
                 .fillMaxWidth(),
             color = BeyazSurface,
             shape = RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp),
@@ -151,7 +168,7 @@ fun MapDisplay(pairingCode: String, onLogout: () -> Unit) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(top = 18.dp, start = 16.dp, end = 16.dp)
+                    .padding(top = 16.dp, start = 16.dp, end = 16.dp, bottom = 12.dp)
             ) {
                 // Başlık ve Canlı Durum İndikatörü
                 Row(
@@ -163,7 +180,10 @@ fun MapDisplay(pairingCode: String, onLogout: () -> Unit) {
                         text = "Takip Kodu: $pairingCode",
                         fontWeight = FontWeight.ExtraBold,
                         fontSize = 20.sp,
-                        color = BeyazNavy
+                        color = BeyazNavy,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(1f)
                     )
 
                     // Yeşil "Canlı" Rozeti
@@ -172,7 +192,7 @@ fun MapDisplay(pairingCode: String, onLogout: () -> Unit) {
                         modifier = Modifier
                             .clip(RoundedCornerShape(8.dp))
                             .background(BeyazSuccessContainer)
-                            .padding(horizontal = 12.dp, vertical = 6.dp)
+                            .padding(horizontal = 12.dp, vertical = 7.dp)
                     ) {
                         Box(modifier = Modifier.size(8.dp).background(BeyazSuccess, CircleShape))
                         Spacer(modifier = Modifier.width(6.dp))
@@ -189,35 +209,59 @@ fun MapDisplay(pairingCode: String, onLogout: () -> Unit) {
                 Text(
                     text = "Akıllı Baston Sistem Logları",
                     fontWeight = FontWeight.Bold,
-                    fontSize = 14.sp,
+                    fontSize = 15.sp,
                     color = BeyazTextSecondary,
-                    modifier = Modifier.padding(bottom = 8.dp)
+                    modifier = Modifier.padding(bottom = 6.dp)
                 )
 
-                // Log Listesi (Scroll edilebilir) - ARTIK CANLI LOGLARI OKUYOR
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(bottom = 16.dp)
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    items(canliLoglar) { log -> // BURASI ARTIK canliLoglar DEĞİŞKENİNİ KULLANIYOR
+                    Text(
+                        text = "${canliLoglar.size} kayıt",
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = BeyazTextSecondary
+                    )
+                    Text(
+                        text = "Sayfa ${currentLogPage + 1} / $totalLogPages",
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = BeyazNavy
+                    )
+                }
+
+                // Log Listesi - her sayfada en fazla 5 kayıt
+                LazyColumn(
+                    modifier = Modifier.weight(1f),
+                    userScrollEnabled = false,
+                    verticalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    items(visibleLoglar) { log -> // BURASI ARTIK canliLoglar DEĞİŞKENİNİ KULLANIYOR
                         // İçinde "Dikkat" geçen logları uyarı olarak renklendiriyoruz
                         val isWarning = log.second.contains("Dikkat")
 
                         Card(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(vertical = 4.dp),
+                                .heightIn(min = 54.dp),
                             shape = RoundedCornerShape(8.dp),
                             colors = CardDefaults.cardColors(containerColor = BeyazSurface),
                             elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
                         ) {
                             Row(
-                                modifier = Modifier.padding(12.dp),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 12.dp, vertical = 8.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Box(
                                     modifier = Modifier
-                                        .size(40.dp)
+                                        .size(34.dp)
                                         .clip(CircleShape)
                                         .background(if (isWarning) BeyazWarning.copy(alpha = 0.14f) else BeyazSurfaceVariant),
                                     contentAlignment = Alignment.Center
@@ -226,11 +270,11 @@ fun MapDisplay(pairingCode: String, onLogout: () -> Unit) {
                                         imageVector = if (isWarning) Icons.Default.Warning else Icons.Default.Info,
                                         contentDescription = null,
                                         tint = if (isWarning) BeyazWarning else BeyazSky,
-                                        modifier = Modifier.size(22.dp)
+                                        modifier = Modifier.size(19.dp)
                                     )
                                 }
-                                Spacer(modifier = Modifier.width(12.dp))
-                                Column {
+                                Spacer(modifier = Modifier.width(10.dp))
+                                Column(modifier = Modifier.weight(1f)) {
                                     Text(
                                         text = log.first, // Saat
                                         fontSize = 12.sp,
@@ -241,11 +285,53 @@ fun MapDisplay(pairingCode: String, onLogout: () -> Unit) {
                                         text = log.second, // Log metni
                                         fontSize = 14.sp,
                                         color = BeyazTextPrimary,
-                                        fontWeight = FontWeight.SemiBold
+                                        fontWeight = FontWeight.SemiBold,
+                                        maxLines = 2,
+                                        overflow = TextOverflow.Ellipsis
                                     )
                                 }
                             }
                         }
+                    }
+                }
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    OutlinedButton(
+                        onClick = { if (currentLogPage > 0) currentLogPage-- },
+                        enabled = currentLogPage > 0,
+                        shape = RoundedCornerShape(8.dp),
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = BeyazNavy),
+                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                            contentDescription = "Önceki sayfa",
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text("Önceki", fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                    }
+
+                    OutlinedButton(
+                        onClick = { if (currentLogPage < totalLogPages - 1) currentLogPage++ },
+                        enabled = currentLogPage < totalLogPages - 1,
+                        shape = RoundedCornerShape(8.dp),
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = BeyazNavy),
+                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)
+                    ) {
+                        Text("Sonraki", fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                            contentDescription = "Sonraki sayfa",
+                            modifier = Modifier.size(18.dp)
+                        )
                     }
                 }
             }
