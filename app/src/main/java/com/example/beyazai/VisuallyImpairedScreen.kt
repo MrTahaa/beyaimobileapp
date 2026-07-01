@@ -15,11 +15,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -28,6 +28,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat
 import androidx.navigation.NavController
+import com.example.beyazai.ui.theme.BeyazDarkBackground
+import com.example.beyazai.ui.theme.BeyazDarkSurface
+import com.example.beyazai.ui.theme.BeyazDarkSurfaceVariant
+import com.example.beyazai.ui.theme.BeyazDarkText
+import com.example.beyazai.ui.theme.BeyazError
+import com.example.beyazai.ui.theme.BeyazSky
+import com.example.beyazai.ui.theme.BeyazSurfaceVariant
+import com.example.beyazai.ui.theme.BeyazTeal
+import com.example.beyazai.ui.theme.BeyazTextSecondary
+import com.example.beyazai.ui.theme.BeyazWarning
 import com.google.android.gms.location.*
 import com.google.firebase.database.FirebaseDatabase
 import java.util.Locale
@@ -145,7 +155,7 @@ fun VisuallyImpairedScreen(navController: NavController) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF121212))
+            .background(BeyazDarkBackground)
             // 1. ÇİFT DOKUNUŞ (ANA MENÜYE DÖNÜŞ)
             .pointerInput(Unit) {
                 detectTapGestures(
@@ -189,22 +199,32 @@ fun VisuallyImpairedScreen(navController: NavController) {
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.padding(24.dp)
+            modifier = Modifier
+                .padding(24.dp)
+                .widthIn(max = 460.dp)
         ) {
-            Icon(
-                imageVector = Icons.Default.LocationOn,
-                contentDescription = "Konum İkonu",
-                tint = if (anlikEnlem != 0.0) Color(0xFF00E676) else Color.Gray,
+            Box(
                 modifier = Modifier
-                    .size(64.dp)
-                    .padding(bottom = 16.dp)
-            )
+                    .size(96.dp)
+                    .background(BeyazDarkSurfaceVariant, RoundedCornerShape(8.dp)),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Default.LocationOn,
+                    contentDescription = "Konum İkonu",
+                    tint = if (anlikEnlem != 0.0) BeyazTeal else BeyazTextSecondary,
+                    modifier = Modifier.size(56.dp)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(18.dp))
 
             Text(
                 text = if (hasLocationPermission) "Gözetim Modu Aktif" else "Konum İzni Bekleniyor...",
-                color = Color.White,
-                fontSize = 26.sp,
-                fontWeight = FontWeight.Bold,
+                color = BeyazDarkText,
+                style = MaterialTheme.typography.titleLarge,
+                fontSize = 28.sp,
+                fontWeight = FontWeight.ExtraBold,
                 textAlign = TextAlign.Center
             )
 
@@ -212,17 +232,17 @@ fun VisuallyImpairedScreen(navController: NavController) {
 
             Box(
                 modifier = Modifier
-                    .background(Color(0xFF1E1E1E), RoundedCornerShape(12.dp))
-                    .border(2.dp, Color(0xFFFFD600), RoundedCornerShape(12.dp))
+                    .background(BeyazDarkSurface, RoundedCornerShape(8.dp))
+                    .border(2.dp, BeyazWarning, RoundedCornerShape(8.dp))
                     .padding(horizontal = 32.dp, vertical = 16.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
                     text = "KOD: $sabitKod",
-                    color = Color(0xFFFFD600),
+                    color = BeyazWarning,
                     fontSize = 32.sp,
                     fontWeight = FontWeight.ExtraBold,
-                    letterSpacing = 2.sp
+                    letterSpacing = 0.sp
                 )
             }
 
@@ -232,20 +252,20 @@ fun VisuallyImpairedScreen(navController: NavController) {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color(0xFF1E1E1E), RoundedCornerShape(12.dp))
+                    .background(BeyazDarkSurface, RoundedCornerShape(8.dp))
                     .padding(16.dp)
             ) {
                 Text(
                     text = if (anlikEnlem != 0.0) "GPS BULUNDU" else "UYDU ARANIYOR...",
-                    color = if (anlikEnlem != 0.0) Color(0xFF00E676) else Color(0xFFFF5252),
+                    color = if (anlikEnlem != 0.0) BeyazTeal else BeyazError,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold,
-                    letterSpacing = 1.sp
+                    letterSpacing = 0.sp
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     text = if (anlikEnlem != 0.0) "Enlem: $anlikEnlem\nBoylam: $anlikBoylam" else "-- / --",
-                    color = Color.LightGray,
+                    color = BeyazSurfaceVariant,
                     fontSize = 16.sp,
                     textAlign = TextAlign.Center,
                     lineHeight = 24.sp
@@ -256,7 +276,7 @@ fun VisuallyImpairedScreen(navController: NavController) {
             Spacer(modifier = Modifier.height(16.dp))
             Text(
                 text = "Son Uyarı: ${mevcutLoglar[aktifLogIndeksi]}",
-                color = Color(0xFF4FC3F7),
+                color = BeyazSky,
                 fontSize = 14.sp,
                 textAlign = TextAlign.Center,
                 fontStyle = androidx.compose.ui.text.font.FontStyle.Italic
@@ -266,7 +286,7 @@ fun VisuallyImpairedScreen(navController: NavController) {
 
             Text(
                 text = "Ana menü: Çift Dokun\nLog Okuma: Sağa/Sola Kaydır",
-                color = Color.Gray,
+                color = BeyazTextSecondary,
                 fontSize = 14.sp,
                 textAlign = TextAlign.Center
             )

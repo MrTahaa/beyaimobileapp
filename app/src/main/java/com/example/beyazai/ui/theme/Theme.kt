@@ -1,51 +1,55 @@
 package com.example.beyazai.ui.theme
 
-import android.app.Activity
-import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.dynamicDarkColorScheme
-import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
+    primary = BeyazTeal,
+    onPrimary = BeyazNavy,
+    primaryContainer = BeyazDarkSurfaceVariant,
+    onPrimaryContainer = BeyazDarkText,
+    secondary = BeyazSky,
+    onSecondary = BeyazNavy,
+    tertiary = BeyazWarning,
+    background = BeyazDarkBackground,
+    onBackground = BeyazDarkText,
+    surface = BeyazDarkSurface,
+    onSurface = BeyazDarkText,
+    surfaceVariant = BeyazDarkSurfaceVariant,
+    onSurfaceVariant = BeyazSurfaceVariant,
+    error = BeyazError
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
-
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+    primary = BeyazNavy,
+    onPrimary = BeyazSurface,
+    primaryContainer = BeyazSurfaceVariant,
+    onPrimaryContainer = BeyazNavy,
+    secondary = BeyazTeal,
+    onSecondary = BeyazSurface,
+    secondaryContainer = BeyazSuccessContainer,
+    onSecondaryContainer = BeyazTealDark,
+    tertiary = BeyazSky,
+    background = BeyazBackground,
+    onBackground = BeyazTextPrimary,
+    surface = BeyazSurface,
+    onSurface = BeyazTextPrimary,
+    surfaceVariant = BeyazSurfaceVariant,
+    onSurfaceVariant = BeyazTextSecondary,
+    outline = BeyazDivider,
+    error = BeyazError
 )
 
 @Composable
 fun BeyazaiTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        }
-
         darkTheme -> DarkColorScheme
         else -> LightColorScheme
     }

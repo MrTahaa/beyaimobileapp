@@ -8,7 +8,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ExitToApp
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.*
@@ -22,6 +22,19 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.beyazai.ui.theme.BeyazBackground
+import com.example.beyazai.ui.theme.BeyazDivider
+import com.example.beyazai.ui.theme.BeyazError
+import com.example.beyazai.ui.theme.BeyazNavy
+import com.example.beyazai.ui.theme.BeyazSky
+import com.example.beyazai.ui.theme.BeyazSuccess
+import com.example.beyazai.ui.theme.BeyazSuccessContainer
+import com.example.beyazai.ui.theme.BeyazSurface
+import com.example.beyazai.ui.theme.BeyazSurfaceVariant
+import com.example.beyazai.ui.theme.BeyazTealDark
+import com.example.beyazai.ui.theme.BeyazTextPrimary
+import com.example.beyazai.ui.theme.BeyazTextSecondary
+import com.example.beyazai.ui.theme.BeyazWarning
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -98,7 +111,7 @@ fun MapDisplay(pairingCode: String, onLogout: () -> Unit) {
         cameraPositionState.animate(CameraUpdateFactory.newLatLngZoom(cihazKonumu, 15f), 1000)
     }
 
-    Column(modifier = Modifier.fillMaxSize().background(Color(0xFFF5F6FA))) {
+    Column(modifier = Modifier.fillMaxSize().background(BeyazBackground)) {
         // ÜST KISIM: HARİTA (%60)
         Box(modifier = Modifier.weight(0.6f)) {
             GoogleMap(modifier = Modifier.fillMaxSize(), cameraPositionState = cameraPositionState) {
@@ -111,11 +124,12 @@ fun MapDisplay(pairingCode: String, onLogout: () -> Unit) {
                 modifier = Modifier
                     .align(Alignment.TopEnd)
                     .padding(16.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE53935)),
-                shape = RoundedCornerShape(50)
+                colors = ButtonDefaults.buttonColors(containerColor = BeyazError),
+                shape = RoundedCornerShape(8.dp),
+                elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
             ) {
                 Icon(
-                    imageVector = Icons.Default.ExitToApp,
+                    imageVector = Icons.AutoMirrored.Filled.ExitToApp,
                     contentDescription = "Çıkış",
                     modifier = Modifier.size(18.dp),
                     tint = Color.White
@@ -126,89 +140,110 @@ fun MapDisplay(pairingCode: String, onLogout: () -> Unit) {
         }
 
         // ALT KISIM: TELEMETRİ VE LOG PANELI (%40)
-        Column(
+        Surface(
             modifier = Modifier
                 .weight(0.4f)
-                .fillMaxWidth()
-                .padding(top = 16.dp, start = 16.dp, end = 16.dp)
+                .fillMaxWidth(),
+            color = BeyazSurface,
+            shape = RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp),
+            shadowElevation = 6.dp
         ) {
-            // Başlık ve Canlı Durum İndikatörü
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = 18.dp, start = 16.dp, end = 16.dp)
             ) {
-                Text(
-                    text = "Takip Kodu: $pairingCode",
-                    fontWeight = FontWeight.ExtraBold,
-                    fontSize = 20.sp,
-                    color = Color(0xFF2F3640)
+                // Başlık ve Canlı Durum İndikatörü
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Takip Kodu: $pairingCode",
+                        fontWeight = FontWeight.ExtraBold,
+                        fontSize = 20.sp,
+                        color = BeyazNavy
+                    )
+
+                    // Yeşil "Canlı" Rozeti
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(BeyazSuccessContainer)
+                            .padding(horizontal = 12.dp, vertical = 6.dp)
+                    ) {
+                        Box(modifier = Modifier.size(8.dp).background(BeyazSuccess, CircleShape))
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text("Canlı", color = BeyazTealDark, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                    }
+                }
+
+                HorizontalDivider(
+                    modifier = Modifier.padding(vertical = 12.dp),
+                    thickness = 1.dp,
+                    color = BeyazDivider
                 )
 
-                // Yeşil "Canlı" Rozeti
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(50))
-                        .background(Color(0xFFE8F5E9))
-                        .padding(horizontal = 12.dp, vertical = 6.dp)
+                Text(
+                    text = "Akıllı Baston Sistem Logları",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 14.sp,
+                    color = BeyazTextSecondary,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+
+                // Log Listesi (Scroll edilebilir) - ARTIK CANLI LOGLARI OKUYOR
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(bottom = 16.dp)
                 ) {
-                    Box(modifier = Modifier.size(8.dp).background(Color(0xFF4CAF50), CircleShape))
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text("Canlı", color = Color(0xFF2E7D32), fontWeight = FontWeight.Bold, fontSize = 14.sp)
-                }
-            }
+                    items(canliLoglar) { log -> // BURASI ARTIK canliLoglar DEĞİŞKENİNİ KULLANIYOR
+                        // İçinde "Dikkat" geçen logları uyarı olarak renklendiriyoruz
+                        val isWarning = log.second.contains("Dikkat")
 
-            Divider(modifier = Modifier.padding(vertical = 12.dp), color = Color(0xFFECDDCD), thickness = 1.dp)
-
-            Text(
-                text = "Akıllı Baston Sistem Logları",
-                fontWeight = FontWeight.Bold,
-                fontSize = 14.sp,
-                color = Color.Gray,
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
-
-            // Log Listesi (Scroll edilebilir) - ARTIK CANLI LOGLARI OKUYOR
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(bottom = 16.dp)
-            ) {
-                items(canliLoglar) { log -> // BURASI ARTIK canliLoglar DEĞİŞKENİNİ KULLANIYOR
-                    // İçinde "Dikkat" geçen logları uyarı olarak renklendiriyoruz
-                    val isWarning = log.second.contains("Dikkat")
-
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 4.dp),
-                        colors = CardDefaults.cardColors(containerColor = Color.White),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-                    ) {
-                        Row(
-                            modifier = Modifier.padding(12.dp),
-                            verticalAlignment = Alignment.CenterVertically
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 4.dp),
+                            shape = RoundedCornerShape(8.dp),
+                            colors = CardDefaults.cardColors(containerColor = BeyazSurface),
+                            elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
                         ) {
-                            Icon(
-                                imageVector = if (isWarning) Icons.Default.Warning else Icons.Default.Info,
-                                contentDescription = null,
-                                tint = if (isWarning) Color(0xFFFF9800) else Color(0xFF2196F3),
-                                modifier = Modifier.size(28.dp)
-                            )
-                            Spacer(modifier = Modifier.width(12.dp))
-                            Column {
-                                Text(
-                                    text = log.first, // Saat
-                                    fontSize = 12.sp,
-                                    color = Color.Gray,
-                                    fontWeight = FontWeight.Medium
-                                )
-                                Text(
-                                    text = log.second, // Log metni
-                                    fontSize = 14.sp,
-                                    color = Color(0xFF2F3640),
-                                    fontWeight = FontWeight.SemiBold
-                                )
+                            Row(
+                                modifier = Modifier.padding(12.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(40.dp)
+                                        .clip(CircleShape)
+                                        .background(if (isWarning) BeyazWarning.copy(alpha = 0.14f) else BeyazSurfaceVariant),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(
+                                        imageVector = if (isWarning) Icons.Default.Warning else Icons.Default.Info,
+                                        contentDescription = null,
+                                        tint = if (isWarning) BeyazWarning else BeyazSky,
+                                        modifier = Modifier.size(22.dp)
+                                    )
+                                }
+                                Spacer(modifier = Modifier.width(12.dp))
+                                Column {
+                                    Text(
+                                        text = log.first, // Saat
+                                        fontSize = 12.sp,
+                                        color = BeyazTextSecondary,
+                                        fontWeight = FontWeight.Medium
+                                    )
+                                    Text(
+                                        text = log.second, // Log metni
+                                        fontSize = 14.sp,
+                                        color = BeyazTextPrimary,
+                                        fontWeight = FontWeight.SemiBold
+                                    )
+                                }
                             }
                         }
                     }
