@@ -1,6 +1,7 @@
 package com.example.beyazai
 
 import android.speech.tts.TextToSpeech
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Lock
@@ -8,11 +9,13 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shadow
@@ -23,6 +26,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.beyazai.ui.theme.BeyazNavy
+import com.example.beyazai.ui.theme.BeyazNavyLight
+import com.example.beyazai.ui.theme.BeyazSky
+import com.example.beyazai.ui.theme.BeyazTeal
 import java.util.Locale
 
 @Composable
@@ -65,34 +72,24 @@ fun SelectionScreen(navController: NavController) {
                 .fillMaxWidth()
                 .weight(1f),
             shape = RectangleShape,
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1E88E5))
+            contentPadding = PaddingValues(0.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = BeyazNavy)
         ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Person,
-                    contentDescription = "Görme Engelli İkonu",
-                    modifier = Modifier.size(72.dp),
-                    tint = Color.White
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-                Text(
-                    text = "Görme Engelli\nGirişi",
-                    style = TextStyle(
-                        fontSize = 32.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                        color = Color.White,
-                        textAlign = TextAlign.Center,
-                        shadow = Shadow(
-                            color = Color.Black.copy(alpha = 0.3f),
-                            offset = Offset(2f, 4f),
-                            blurRadius = 4f
-                        )
+            SelectionActionContent(
+                title = "Görme Engelli\nGirişi",
+                subtitle = "Yüksek kontrast takip modu",
+                icon = {
+                    Icon(
+                        imageVector = Icons.Default.Person,
+                        contentDescription = "Görme Engelli İkonu",
+                        modifier = Modifier.size(76.dp),
+                        tint = Color.White
                     )
+                },
+                background = Brush.verticalGradient(
+                    colors = listOf(BeyazNavy, BeyazNavyLight)
                 )
-            }
+            )
         }
 
         // EKRANIN ALT YARISI (%50) - AİLE PANELİ
@@ -105,34 +102,81 @@ fun SelectionScreen(navController: NavController) {
                 .fillMaxWidth()
                 .weight(1f),
             shape = RectangleShape,
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF43A047))
+            contentPadding = PaddingValues(0.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = BeyazTeal)
         ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Lock,
-                    contentDescription = "Aile Paneli İkonu",
-                    modifier = Modifier.size(72.dp),
-                    tint = Color.White
+            SelectionActionContent(
+                title = "Aile Paneli\nGirişi",
+                subtitle = "Konum ve uyarı takibi",
+                icon = {
+                    Icon(
+                        imageVector = Icons.Default.Lock,
+                        contentDescription = "Aile Paneli İkonu",
+                        modifier = Modifier.size(76.dp),
+                        tint = Color.White
+                    )
+                },
+                background = Brush.verticalGradient(
+                    colors = listOf(BeyazTeal, BeyazSky)
                 )
-                Spacer(modifier = Modifier.height(16.dp))
-                Text(
-                    text = "Aile Paneli\nGirişi",
-                    style = TextStyle(
-                        fontSize = 32.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                        color = Color.White,
-                        textAlign = TextAlign.Center,
-                        shadow = Shadow(
-                            color = Color.Black.copy(alpha = 0.3f),
-                            offset = Offset(2f, 4f),
-                            blurRadius = 4f
-                        )
+            )
+        }
+    }
+}
+
+@Composable
+private fun SelectionActionContent(
+    title: String,
+    subtitle: String,
+    icon: @Composable () -> Unit,
+    background: Brush
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(background)
+            .padding(horizontal = 28.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(116.dp)
+                    .background(Color.White.copy(alpha = 0.15f), RectangleShape),
+                contentAlignment = Alignment.Center
+            ) {
+                icon()
+            }
+
+            Spacer(modifier = Modifier.height(22.dp))
+
+            Text(
+                text = title,
+                style = TextStyle(
+                    fontSize = 32.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = Color.White,
+                    textAlign = TextAlign.Center,
+                    lineHeight = 38.sp,
+                    shadow = Shadow(
+                        color = Color.Black.copy(alpha = 0.24f),
+                        offset = Offset(1f, 3f),
+                        blurRadius = 6f
                     )
                 )
-            }
+            )
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            Text(
+                text = subtitle,
+                style = MaterialTheme.typography.labelLarge,
+                color = Color.White.copy(alpha = 0.82f),
+                textAlign = TextAlign.Center
+            )
         }
     }
 }
